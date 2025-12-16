@@ -1,0 +1,25 @@
+services:
+  app:   #第一个服务
+    image: node:18-alpine  #使用 Node.js 官方镜像作为运行环境
+    command: sh -c "yarn install && yarn run dev" #启动命令，安装依赖(json文件)并运行开发服务器
+    ports:
+      - 127.0.0.1:3000:3000 #[宿主机IP]:宿主机端口:容器端口
+    working_dir: /app #设置工作目录
+    volumes:
+      - ./:/app #./：宿主机当前目录（你放代码的项目根目录）  /app：容器里面的目录
+    environment:  #设置环境变量，连接 MySQL 所需的信息
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: secret
+      MYSQL_DB: todos
+
+  mysql:  #第二个服务
+    image: mysql:8.0  #使用 MySQL 官方镜像
+    volumes:  #定义一个券以持久化应用数据
+      - todo-mysql-data:/var/lib/mysql  #将宿主机的 todo-mysql-data 卷挂载到容器的 /var/lib/mysql 目录
+    environment:  #设置 MySQL 初始化所需的环境变量
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: todos
+
+volumes:  #声明一个命名卷
+  todo-mysql-data:
